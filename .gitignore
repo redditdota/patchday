@@ -3,3 +3,6 @@
 
 # Ignore updates to credentials file
 creds.json
+
+# Ignore virtual environment
+venv/

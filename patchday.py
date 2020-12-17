@@ -1,7 +1,7 @@
 import json
-import requests
 from dataclasses import dataclass
 
+import requests
 import praw
 from bs4 import BeautifulSoup
 
