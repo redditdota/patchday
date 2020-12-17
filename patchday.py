@@ -5,20 +5,30 @@ import requests
 import praw
 from bs4 import BeautifulSoup
 
-THREAD_ID = "" # "hs5iwf"
-VERSION = "7.27d"
+VERSION = "7.28"
+SUBREDDIT = "Dota2"
+
+thread_title = f"Patch {VERSION} - Hero Changes Discussion"
+thread_body = """Updated heroes are each listed below as a top level comment. 
+Please discuss changes to a specific hero there!
+
+**All other top level comments are automatically removed.**"""
+
 
 def main():
     """ Remaining manual actions:
-    - create thread
     - set suggested sort to "old"
     - add thread id to automod config to remove top-level comments (control+f "patchday")
     - make note of unchanged heroes?
     - disable inbox replies?
+    - set flair
+    - aggregate direct links to each hero in the OP, for ease of access
     """
     reddit = login_to_reddit()
-    thread = reddit.submission(THREAD_ID)
-    for hero in get_all_hero_patches():
+    reddit.validate_on_submit = True
+    thread = reddit.subreddit(SUBREDDIT).submit(title=thread_title, selftext=thread_body)
+    print(thread.id)
+    for hero in get_all_hero_patches(VERSION):
         thread.reply(body=hero.reddit_comment_contents)
 
 @dataclass
@@ -41,9 +51,8 @@ def login_to_reddit():
     with open("creds.json") as f:
         return praw.Reddit(user_agent="patchday script by /u/Decency", **json.load(f))
 
-
-def get_all_hero_patches():
-    r = requests.get(f"http://www.dota2.com/patches/{VERSION}")
+def get_all_hero_patches(version):
+    r = requests.get(f"http://www.dota2.com/patches/{version}")
     soup = BeautifulSoup(r.text, 'html.parser')
     heroes_changed = soup.findAll("div", {"class": "HeroNotes"})
     output = []
@@ -58,7 +67,7 @@ def get_all_hero_patches():
 if __name__ == "__main__":
     debug = True
     if debug:
-        for hero_patch in get_all_hero_patches():
+        for hero_patch in get_all_hero_patches(VERSION):
             print("\n" + hero_patch.reddit_comment_contents)
     else:
         main()
