@@ -1,2 +1,5 @@
 *.py[co]
+.idea/
 
+# Ignore updates to credentials file
+creds.json
