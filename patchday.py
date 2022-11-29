@@ -8,7 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 TEST = True
-VERSION = "7.32c"
+VERSION = "7.32d"
 
 thread_title = f"Patch {VERSION} - Hero Changes Discussion"
 thread_header = """Updated heroes are each listed below as a top level comment.
