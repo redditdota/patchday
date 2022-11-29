@@ -6,3 +6,7 @@ creds.json
 
 # Ignore virtual environment
 venv/
+
+# Ignore misc
+.DS_Store
+__init__.py
