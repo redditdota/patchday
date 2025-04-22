@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 
-
 @dataclass
 class HeroPatch:
     """All changes made in a given patch to one hero, with associated properties.
@@ -30,6 +29,16 @@ class HeroPatch:
         return lines + change_lines
 
     @property
+    def facet_lines(self):
+        if not self.facet_changes:
+            return ""
+        lines = "#### Facets\n\n"
+        for facet_name, changes in self.facet_changes.items():
+            change_lines = "\n".join(f"    - {change}" for change in changes)
+            lines += f"  - **{facet_name}**\n\n{change_lines}\n\n"
+        return lines
+
+    @property
     def ability_lines(self):
         if not self.ability_changes:
             return ""
@@ -46,16 +55,6 @@ class HeroPatch:
         lines = "#### Talents\n\n"
         for change in self.talent_changes:
             lines += f"- {change}\n"
-        return lines
-
-    @property
-    def facet_lines(self):
-        if not self.facet_changes:
-            return ""
-        lines = "#### Facets\n\n"
-        for facet_name, changes in self.facet_changes.items():
-            change_lines = "\n".join(f"    - {change}" for change in changes)
-            lines += f"  - **{facet_name}**\n\n{change_lines}\n\n"
         return lines
 
     @property
@@ -96,7 +95,7 @@ class HeroPatch:
                 ..
         """
         sections = list(section for section in raw_hero_data)
-        general_section, empty_section = sections[0:2]  # header and general changes section, blank section
+        general_section, empty_section = sections[:2]  # header and general changes section, empty section
         change_sections = sections[2:] # any changes to facets, abilities, and talents are in here
         hero_name = next(anchor.text.strip() for anchor in general_section.find_all("a") if anchor.text)
 
@@ -130,13 +129,13 @@ def extract_general_changes(section):
         general_container = list(child for child in general_area.children)[2]
         general_changes = [change.text for change in general_container.children]
     except IndexError:
+        # not found, no general changes
         general_changes = []
     return general_changes
 
-
 def extract_facet_changes(section):
     facet_changes = {}
-    facets_changed = [child for child in section.children][1]  # 0 is the 'Facets' div
+    facets_changed = [child for child in section.children][1]  # 0 is the 'Facets' text div
     for facet in facets_changed:
         # divs 0-3 are "New"/"Reworked" cruft, 4-5 is facet header, 6 is facet changes (as a tree)
         facet_name = next(p.text for p in [child for child in facet.children][5] if p.text)
@@ -159,7 +158,6 @@ def extract_facet_changes(section):
                 facet_changes[facet_name].append(change.text)
     return facet_changes
 
-
 def extract_ability_changes(section):
     ability_changes = {}
     abilities_changed = list(child for child in section.children)
@@ -170,7 +168,6 @@ def extract_ability_changes(section):
         ability_name, note = strings[0], strings[1:]
         ability_changes[ability_name] = note
     return ability_changes
-
 
 def extract_talent_changes(section):
     talent_notes = list(child for child in section.children)[1]
