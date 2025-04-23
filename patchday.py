@@ -17,7 +17,7 @@ Please discuss changes to a specific hero there!
 
 **All other top level comments are automatically removed.**"""
 
-def main(subreddit):
+def post(subreddit):
     """Creates a new reddit thread and posts a reply for each updated hero with their changes.
     Additionally, makes note of unchanged heroes and creates tables in the OP with comment links.
 
@@ -103,11 +103,9 @@ def get_all_hero_names():
 
 if __name__ == "__main__":
     if TEST:
-        location = "dota2test"
         print("\nTesting...\n")
     else:
-        location = "dota2"
         print("\nLIVE: preparing to publish...\n")
     location = "dota2test" if TEST else "dota2"
-    main(location)
+    post(location)
     print("Completed.")
