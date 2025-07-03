@@ -155,7 +155,8 @@ def extract_facet_changes(section):
         else:
             # facet changes don't correspond to an ability, just pass along the change list
             for change in facet_change_container:
-                facet_changes[facet_name].append(change.text)
+                if change.text:
+                    facet_changes[facet_name].append(change.text)
     return facet_changes
 
 def extract_ability_changes(section):

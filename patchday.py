@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.options import Options
 from hero_patch import HeroPatch
 
 TEST = True
-VERSION = "7.38c"
+VERSION = "7.39c"
 
 thread_title = f"Patch {VERSION} - Hero Changes Discussion"
 thread_header = """Updated heroes are each listed below as a top level comment.
@@ -28,7 +28,6 @@ def post(subreddit):
     - add outputted thread id to automod config to remove top-level comments (control+f "patchday")
     """
     patched_heroes = get_all_hero_patches(VERSION)
-
     thread = create_thread(subreddit)
     print(f"\n{VERSION} patchday thread posted; ID for AutoModerator config: `{thread.id}`")
     print(f"    <https://old.reddit.com/{thread.id}>\n")
@@ -61,7 +60,7 @@ def get_all_hero_patches(version):
 
 def create_thread(subreddit):
     with open("creds.json") as f:
-        reddit = praw.Reddit(user_agent="patchday script by /u/Decency", **json.load(f))
+        reddit = praw.Reddit(**json.load(f))
     reddit.validate_on_submit = True
     sub = reddit.subreddit(subreddit)
     choices = list(sub.flair.link_templates.user_selectable())
@@ -102,10 +101,8 @@ def get_all_hero_names():
         return set(hero.strip() for hero in f.readlines())
 
 if __name__ == "__main__":
-    if TEST:
-        print("\nTesting...\n")
-    else:
-        print("\nLIVE: preparing to publish...\n")
+    status = 'Testing...' if TEST else 'LIVE: preparing to publish...'
     location = "dota2test" if TEST else "dota2"
+    print(f"\n{status}\n")
     post(location)
     print("Completed.")
